@@ -23,14 +23,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
         <a href="#" className="flex items-center gap-2 group">
-          <span className="w-7 h-7 rounded-lg bg-cyan-400 flex items-center justify-center transition-all group-hover:scale-110 group-hover:rotate-3">
-            <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-            </svg>
-          </span>
-          <span className="font-['Cabinet_Grotesk'] font-black text-xl text-white tracking-tight">
-            Coderyx
-          </span>
+          <img src="./logo.svg" alt=""/>
         </a>
 
         {/* Desktop links */}

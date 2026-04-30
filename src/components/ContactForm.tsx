@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useReveal } from '../hooks/useReveal'
 
 interface FormData {
@@ -8,12 +8,142 @@ interface FormData {
   message: string
 }
 
+const budgetOptions = [
+  { value: '< 200',    label: 'Menos de U$D200',   sub: 'Proyectos pequeños' },
+  { value: '200-600',  label: 'U$D200 – U$D600',      sub: 'Webs y MVPs' },
+  { value: '600-1000', label: 'U$D600 – U$D1,000',    sub: 'Apps robustas' },
+  { value: '> 1000',   label: 'Más de U$D1,000',    sub: 'Proyectos enterprise' },
+]
+
+function BudgetSelect({
+  value,
+  onChange,
+  inputBase,
+}: {
+  value: string
+  onChange: (val: string) => void
+  inputBase: string
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const selected = budgetOptions.find(o => o.value === value)
+
+  return (
+    <div ref={ref} className="relative">
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen(prev => !prev)}
+        className={`${inputBase} flex items-center justify-between cursor-pointer ${
+          open ? 'border-cyan-400/50 bg-white/[0.06]' : ''
+        }`}
+      >
+        <span className={selected ? 'text-white' : 'text-gray-600'}>
+          {selected ? selected.label : 'Selecciona un rango'}
+        </span>
+
+        {/* Chevron */}
+        <svg
+          className={`w-4 h-4 transition-transform duration-300 ${
+            open ? 'rotate-180 text-cyan-400' : 'text-gray-500'
+          }`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Dropdown panel */}
+      {open && (
+        <div className="absolute z-50 left-0 right-0 mt-2 rounded-2xl overflow-hidden border border-white/10 bg-[#0f0f0f] shadow-2xl shadow-black/60 backdrop-blur-xl">
+          {/* Línea decorativa superior */}
+          <div className="h-px w-full bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
+
+          <ul className="py-1">
+            {budgetOptions.map(opt => {
+              const isActive = opt.value === value
+              return (
+                <li key={opt.value}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onChange(opt.value)
+                      setOpen(false)
+                    }}
+                    className={`w-full flex items-center justify-between px-5 py-3.5 text-left transition-all duration-200 group ${
+                      isActive
+                        ? 'bg-cyan-400/10 text-cyan-400'
+                        : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    {/* Label + subtítulo */}
+                    <span className="flex flex-col gap-0.5">
+                      <span className="text-sm font-semibold">{opt.label}</span>
+                      <span
+                        className={`text-xs transition-colors duration-200 ${
+                          isActive
+                            ? 'text-cyan-400/70'
+                            : 'text-gray-600 group-hover:text-gray-400'
+                        }`}
+                      >
+                        {opt.sub}
+                      </span>
+                    </span>
+
+                    {/* Check si está activo */}
+                    {isActive && (
+                      <svg
+                        className="w-4 h-4 text-cyan-400 shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    )}
+                  </button>
+
+                  {/* Divisor entre opciones (excepto la última) */}
+                  {opt.value !== '> 50k' && (
+                    <div className="mx-5 h-px bg-white/5" />
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+
+          {/* Línea decorativa inferior */}
+          <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function ContactForm() {
   const ref = useReveal()
   const [form, setForm] = useState<FormData>({ name: '', email: '', budget: '', message: '' })
   const [sent, setSent] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
@@ -23,7 +153,7 @@ export default function ContactForm() {
   }
 
   const inputBase =
-    'w-full bg-white/4 border border-white/8 rounded-xl px-5 py-3.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-cyan-400/50 focus:bg-white/6 transition-all duration-300'
+    'w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-5 py-3.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-cyan-400/50 focus:bg-white/[0.06] transition-all duration-300'
 
   return (
     <section id="contacto" className="py-32 relative" ref={ref}>
@@ -85,21 +215,19 @@ export default function ContactForm() {
                     />
                   </div>
                 </div>
+
+                {/* Custom Select */}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">Presupuesto estimado</label>
-                  <select
-                    name="budget"
+                  <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">
+                    Presupuesto estimado
+                  </label>
+                  <BudgetSelect
                     value={form.budget}
-                    onChange={handleChange}
-                    className={inputBase + ' cursor-pointer'}
-                  >
-                    <option value="" disabled className="bg-[#181818]">Selecciona un rango</option>
-                    <option value="< 5k" className="bg-[#181818]">Menos de $5,000</option>
-                    <option value="5k-15k" className="bg-[#181818]">$5,000 – $15,000</option>
-                    <option value="15k-50k" className="bg-[#181818]">$15,000 – $50,000</option>
-                    <option value="> 50k" className="bg-[#181818]">Más de $50,000</option>
-                  </select>
+                    onChange={val => setForm({ ...form, budget: val })}
+                    inputBase={inputBase}
+                  />
                 </div>
+
                 <div>
                   <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">Cuéntanos tu proyecto</label>
                   <textarea
@@ -108,9 +236,10 @@ export default function ContactForm() {
                     onChange={handleChange}
                     rows={4}
                     placeholder="Describe brevemente qué necesitas construir..."
-                    className={inputBase + ' resize-none'}
+                    className={`${inputBase} resize-none`}
                   />
                 </div>
+
                 <button
                   onClick={handleSubmit}
                   className="btn-primary w-full py-4 rounded-xl text-base mt-2"

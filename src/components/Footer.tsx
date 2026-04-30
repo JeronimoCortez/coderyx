@@ -31,13 +31,8 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-14">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-7 h-7 rounded-lg bg-cyan-400 flex items-center justify-center">
-                <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-              </span>
-              <span className="font-['Cabinet_Grotesk'] font-black text-xl text-white">Coderyx</span>
+            <div className="flex items-center mb-4">
+              <img src="./logo.svg" alt="Coderyx logo" />
             </div>
             <p className="text-gray-500 text-sm leading-relaxed mb-5 max-w-[200px]">
               Transformamos ideas en experiencias digitales excepcionales.
@@ -106,7 +101,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/6 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-gray-600 text-xs">© 2024 Coderyx. Todos los derechos reservados.</p>
+          <p className="text-gray-600 text-xs">© 2025 Coderyx. Todos los derechos reservados.</p>
           <div className="flex gap-5">
             {['Privacidad', 'Términos', 'Cookies'].map((item) => (
               <a key={item} href="#" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">
